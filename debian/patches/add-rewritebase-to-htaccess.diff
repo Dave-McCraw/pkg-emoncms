@@ -1,0 +1,17 @@
+Description: Adding rewritebase to .htaccess so we can serve from outside the docroot.
+Author: Dave McCraw <dave@mccraw.co.uk>
+Origin: vendor
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/.htaccess
++++ b/.htaccess
+@@ -14,6 +14,9 @@ DirectoryIndex index.php
+ # Various rewrite rules.
+ <IfModule mod_rewrite.c>
+   RewriteEngine on
++
++  ## Quilt patch: add RewriteBase to allow emoncms to be served from outside the docroot
++  RewriteBase /emoncms
+  
+   # Rewrite URLs of the form 'x' to the form 'index.php?q=x'.
+   RewriteCond %{REQUEST_FILENAME} !-f
