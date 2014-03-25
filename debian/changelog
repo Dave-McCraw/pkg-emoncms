@@ -1,8 +1,8 @@
-emoncms (8.0.3-1) UNRELEASED; urgency=low
+emoncms (8.0.3-2) unstable; urgency=low
 
   * Switching repo to pkg-emoncms 
 
- -- Dave McCraw <dave@mccraw.co.uk>  Tue, 25 Mar 2014 00:12:34 +0000
+ -- Dave McCraw <dave@mccraw.co.uk>  Tue, 25 Mar 2014 23:33:51 +0000
 
 emoncms (8.0.3) unstable; urgency=low
 
