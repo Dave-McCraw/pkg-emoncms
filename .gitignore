@@ -1,6 +1,6 @@
 .project
 debian/emoncms*
-settings.php
+.pc
 Modules/sync
 Modules/event
 Modules/energyaudit

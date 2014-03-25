@@ -1,0 +1,10 @@
+--- a/index.php
++++ b/index.php
+@@ -13,6 +13,7 @@
+     */
+     
+     $emoncms_version = "8.0.3";
++    $emoncms_version .= "-2 (from apt)";
+ 
+     $ltime = microtime(true);
+ 
