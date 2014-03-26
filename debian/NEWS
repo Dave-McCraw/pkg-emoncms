@@ -1,9 +1,11 @@
-emoncms (8.0.3-2) UNRELEASED; urgency=low
+emoncms (8.0.3-3) unstable; urgency=low
 
   Now packaging in pkg-emoncms. 
   This is the final "version" of 8.0.3, including the upstream fix to the version number...
+  Includes https://github.com/Dave-McCraw/pkg-emoncms/issues/1
+  
 
- -- Dave McCraw <dave@mccraw.co.uk>  Tue, 25 Mar 2014 23:35:27 +0000
+ -- Dave McCraw <dave@mccraw.co.uk>  Wed, 26 Mar 2014 00:28:49 +0000
 
 emoncms (8.0.3) unstable; urgency=low
 

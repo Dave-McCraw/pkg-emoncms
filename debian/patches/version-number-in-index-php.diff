@@ -4,7 +4,7 @@
      */
      
      $emoncms_version = "8.0.3";
-+    $emoncms_version .= "-2 (from apt)";
++    $emoncms_version .= "-3 (from apt)";
  
      $ltime = microtime(true);
  

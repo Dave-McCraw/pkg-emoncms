@@ -1,8 +1,9 @@
-emoncms (8.0.3-2) unstable; urgency=low
+emoncms (8.0.3-3) unstable; urgency=low
 
   * Switching repo to pkg-emoncms 
+  * Fixes issue #1
 
- -- Dave McCraw <dave@mccraw.co.uk>  Tue, 25 Mar 2014 23:33:51 +0000
+ -- Dave McCraw <dave@mccraw.co.uk>  Wed, 26 Mar 2014 00:29:34 +0000
 
 emoncms (8.0.3) unstable; urgency=low
 
