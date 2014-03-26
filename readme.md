@@ -28,17 +28,13 @@ And then install emoncms (all dependencies will also be intalled at this point):
 
 The Debian package manager will now ask you a series of questions to configure emoncms. These are used to generate a valid settings.php file for your installation.
 
-Once the process completes, you need to enable emoncms in Apache:
+If you were to get DB credentials wrong at this point, installation will fail. To update your answers (for this, or any other reason, at any time) you can run:
 
-    sudo a2ensite emoncms
+    sudo dpkg-reconfigure emoncms --force
+    
+Note that your previous answers are pre-populated for convenience; this includes the passwords (just hit enter on the empty field to use the previous password).
 
-Now is also a good time to ensure that mod_rewrite is also running:
-
-    sudo a2enmod rewrite
-
-Now restart Apache:
-
-    sudo /etc/init.d/apache2 restart
+If installation failed (but not otherwise) then you will need to run the emoncms install command again to finish setting it up.
 
 ### Install PECL modules (redis and swift mailer)
 
@@ -76,6 +72,20 @@ You don't need to install all (or indeed any) of the optional add-on modules, bu
 | [MQTT](https://github.com/elyobelyob/mqtt) | manual only |
 
 See the linked readme files for individual modules' installation instructions.
+
+### Restart services
+
+Once you have installed emoncms, you need to enable it in Apache:
+
+    sudo a2ensite emoncms
+
+Now is also a good time to ensure that `mod_rewrite` is also running:
+
+    sudo a2enmod rewrite
+
+Now restart Apache:
+
+    sudo /etc/init.d/apache2 restart
 
 ### In an internet browser, load emoncms:
 
