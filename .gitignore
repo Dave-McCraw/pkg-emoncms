@@ -1,5 +1,6 @@
 .project
 debian/emoncms*
+debian/files
 .pc
 Modules/sync
 Modules/event
