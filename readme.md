@@ -6,6 +6,19 @@ This repository maintains debian packaging for the upstream [emoncms/emoncms](ht
 The emoncms core product is packaged as `emoncms` and can be installed via the OpenEnergyMonitor public apt repository; for details on installation see below.
 
 ## Installation guide
+
+### Preconditions
+
+#### MySQL configuration
+
+_Please note that passwordless DB access is not supported (see [#4](https://github.com/Dave-McCraw/pkg-emoncms/issues/4))._
+
+The `emoncms` debian package has a declared dependency on the `mysql` package, so potentially you can just install emoncms and `apt-get` will pull in MySQL automatically. However, unless you really know what you are doing, set up MySQL first, and verify you can log in with your desired credentials using the following command:
+
+    mysql -u <USERNAME> -p <PASSWORD>
+    
+If this works, providing the same credentials to emoncms during installation should result in a successful database initialisation.
+
 ### Configuring apt.sources
 
 In order to access the OpenEnergyMonitor apt repository you need to add a line to your apt.sources configuration file, which is located at: 
@@ -28,11 +41,13 @@ And then install emoncms (all dependencies will also be intalled at this point):
 
 The Debian package manager will now ask you a series of questions to configure emoncms. These are used to generate a valid settings.php file for your installation.
 
-If you were to get DB credentials wrong at this point, installation will fail. To update your answers (for this, or any other reason, at any time) you can run:
+#### Reconfigure emoncms
+
+If you were to get DB credentials wrong, installation would fail. To update your answers (for this, or any other reason, at any time) you can run:
 
     sudo dpkg-reconfigure emoncms --force
     
-Note that your previous answers are pre-populated for convenience; this includes the passwords (just hit enter on the empty field to use the previous password).
+Note that your previous answers are pre-populated for convenience; this includes the passwords (just hit enter on the empty field to use the previous password - so for this reason, you cannot use a passwordless DB user).
 
 If installation failed (but not otherwise) then you will need to run the emoncms install command again to finish setting it up.
 
