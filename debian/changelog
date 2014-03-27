@@ -1,3 +1,9 @@
+emoncms (8.0.6) unstable; urgency=low
+
+  * Packages 8.0.4, 8.0.5, 8.0.6
+
+ -- Dave McCraw <dave@mccraw.co.uk>  Thu, 27 Mar 2014 20:56:04 +0000
+
 emoncms (8.0.3-3) unstable; urgency=low
 
   * Switching repo to pkg-emoncms 
