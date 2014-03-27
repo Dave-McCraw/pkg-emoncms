@@ -1,10 +1,11 @@
 --- a/index.php
 +++ b/index.php
-@@ -13,6 +13,7 @@
-     */
-     
-     $emoncms_version = "8.0.3";
-+    $emoncms_version .= "-3 (from apt)";
+@@ -18,6 +18,8 @@
  
-     $ltime = microtime(true);
+     define('EMONCMS_EXEC', 1);
  
++    $emoncms_version .= " (from apt)";
++
+     // 1) Load settings and core scripts
+     require "process_settings.php";
+     require "core.php";
