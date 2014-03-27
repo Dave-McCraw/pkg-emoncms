@@ -26,10 +26,7 @@ class PHPFiwa
     {
         $interval = (int) $options['interval'];
         if ($interval<5) $interval = 5;
-        
-        
-        
-        
+
         // Check to ensure we dont overwrite an existing feed
         if (!$meta = $this->get_meta($id))
         {
@@ -74,6 +71,15 @@ class PHPFiwa
 
             // Save meta data
             $this->set_meta($id,$meta);
+            
+            $fh = fopen($this->dir.$meta->id."_0.dat", 'c+');
+            fclose($fh);
+            $fh = fopen($this->dir.$meta->id."_1.dat", 'c+');
+            fclose($fh);
+            $fh = fopen($this->dir.$meta->id."_2.dat", 'c+');
+            fclose($fh);
+            $fh = fopen($this->dir.$meta->id."_3.dat", 'c+');
+            fclose($fh);
         }
 
         $feedname = "$id.meta";
@@ -433,7 +439,14 @@ class PHPFiwa
     public function get_feed_size($id)
     {
         if (!$meta = $this->get_meta($id)) return false;
-        return (filesize($this->dir.$meta->id.".meta") + filesize($this->dir.$meta->id.".dat"));
+        
+        $size = 0;
+        $size += filesize($this->dir.$meta->id.".meta");
+        $size += filesize($this->dir.$meta->id."_0.dat");
+        $size += filesize($this->dir.$meta->id."_1.dat");
+        $size += filesize($this->dir.$meta->id."_2.dat");
+        $size += filesize($this->dir.$meta->id."_3.dat");
+        return $size;
     }
     
 
