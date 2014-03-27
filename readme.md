@@ -7,27 +7,15 @@ The emoncms core product is packaged as `emoncms` and can be installed via the O
 
 ## Installation guide
 
-### Preconditions
+This guide has been verified using a Raspberry Pi with a clean copy of the [latest version of Raspian](http://downloads.raspberrypi.org/raspbian_latest) imaged to the SD card.
 
-#### MySQL configuration
-
-_Please note that passwordless DB access is not supported (see [#4](https://github.com/Dave-McCraw/pkg-emoncms/issues/4))._
-
-The `emoncms` debian package has a declared dependency on the `mysql` package, so potentially you can just install emoncms and `apt-get` will pull in MySQL automatically. However, unless you really know what you are doing, set up MySQL first, and verify you can log in with your desired credentials using the following command:
-
-    mysql -u <USERNAME> -p <PASSWORD>
-    
-If this works, providing the same credentials to emoncms during installation should result in a successful database initialisation.
+No pre-configuration is required - just stick the SD card in your Pi, switch it on, and SSH in, then:
 
 ### Configuring apt.sources
 
-In order to access the OpenEnergyMonitor apt repository you need to add a line to your apt.sources configuration file, which is located at: 
+In order to access the OpenEnergyMonitor apt repository you need to add a line to your apt.sources configuration file. Run the following command:
 
-    /etc/apt/sources.list
-
-You need to add the following line:
-
-    deb http://emon-repo.s3.amazonaws.com wheezy unstable
+    echo 'deb http://emon-repo.s3.amazonaws.com wheezy unstable' >> /etc/apt/sources.list
 
 ### Install emoncms
 
@@ -37,9 +25,11 @@ You will need to update your system repositories:
 
 And then install emoncms (all dependencies will also be intalled at this point):
 
-    sudo apt-get install emoncms
+    sudo apt-get -y --force-yes install emoncms
 
 The Debian package manager will now ask you a series of questions to configure emoncms. These are used to generate a valid settings.php file for your installation.
+
+If you have not yet installed MySQL, it will be installed automatically at this point, and you will be prompted to enter a root password. *This must not be blank.*
 
 #### Reconfigure emoncms
 
@@ -109,3 +99,18 @@ Now restart Apache:
 The first time you run emoncms it will automatically setup the database and you will be taken straight to the register/login screen.
 
 Create an account by entering your email and password and clicking register to complete.
+
+
+## Troubleshooting
+
+_Please feel free to contribute suggestions for this section if you have encountered issues setting up emoncms_
+
+### MySQL configuration
+
+**Please note that passwordless DB access is not supported (see [#4](https://github.com/Dave-McCraw/pkg-emoncms/issues/4)).**
+
+The `emoncms` debian package has a declared dependency on the `mysql-server` and `mysql-client` packages, so you can just install emoncms and `apt-get` will pull in MySQL automatically. If you are having trouble with the installation, verify your credentials manually by running:
+
+    mysql -u <USERNAME> -p <PASSWORD>
+    
+If this works, providing the same credentials to emoncms during installation should result in a successful database initialisation.
