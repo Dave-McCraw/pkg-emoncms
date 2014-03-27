@@ -96,6 +96,8 @@ Now restart Apache:
 
 [http://localhost/emoncms](http://localhost/emoncms)
 
+_If you're running a headless server, you'll obviously need to substitute its IP address or hostname instead of localhost_
+
 The first time you run emoncms it will automatically setup the database and you will be taken straight to the register/login screen.
 
 Create an account by entering your email and password and clicking register to complete.
@@ -104,6 +106,14 @@ Create an account by entering your email and password and clicking register to c
 ## Troubleshooting
 
 _Please feel free to contribute suggestions for this section if you have encountered issues setting up emoncms_
+
+### APT configuration
+
+The OpenEnergyMonitor APT repository currently supports two distributions: 
+ - `wheezy` (Debian/Raspbian) 
+ - `quantal` (Ubuntu). 
+
+Check the row you've added to `/etc/apt/sources.list` matches the existing rows in terms of the distribution, and that the distribution is one of the above (if not, get in touch!)
 
 ### MySQL configuration
 
