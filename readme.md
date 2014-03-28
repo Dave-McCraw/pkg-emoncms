@@ -15,7 +15,7 @@ No pre-configuration is required - just stick the SD card in your Pi, switch it 
 
 In order to access the OpenEnergyMonitor apt repository you need to add a line to your apt.sources configuration file. Run the following command:
 
-    echo "deb http://emon-repo.s3.amazonaws.com `lsb_release -cs` unstable" >> /etc/apt/sources.list
+    sudo echo "deb http://emon-repo.s3.amazonaws.com `lsb_release -cs` unstable" >> /etc/apt/sources.list
 
 ### Install emoncms
 
