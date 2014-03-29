@@ -45,7 +45,7 @@ These modules are optional but will enhance the functionality of emoncms: redis 
 
 Install all dependencies:
 
-    sudo apt-get install php-pear php5-dev
+    sudo apt-get install php-pear php5-dev redis-server
 
 Install pecl modules:
 
