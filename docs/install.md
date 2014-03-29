@@ -1,11 +1,5 @@
-pkg-emoncms
+Installing emoncms using APT
 ========================
-
-This repository maintains debian packaging for the upstream [emoncms/emoncms](https://github.com/emoncms/emoncms) repository.
-
-The emoncms core product is packaged as `emoncms` and can be installed via the OpenEnergyMonitor public apt repository; for details on installation see below.
-
-## Installation guide
 
 This guide has been verified using a Raspberry Pi with a clean copy of the [latest version of Raspian](http://downloads.raspberrypi.org/raspbian_latest) imaged to the SD card.
 
@@ -15,11 +9,11 @@ No pre-configuration is required - just stick the SD card in your Pi, switch it 
 
 In order to access the OpenEnergyMonitor apt repository you need to add a line to your apt.sources configuration file.
 
-If you don't know your distribution, you can get it by running `lsb_release -cs` (you may need to run `sudo apt-get install lsb-release` first).
+You need to specify your distribution by substituting out `<DISTRO>` in the following command.
 
-Now run the following command, substituting `<DISTRO>`:
+At the time of writing the supported values for <DISTRO> are `wheezy` and `quantal` only:
 
-    sudo echo "deb http://emon-repo.s3.amazonaws.com <DISTRO> unstable" >> /etc/apt/sources.list
+    sudo sh -c "echo 'deb http://emon-repo.s3.amazonaws.com <DISTRO> unstable' >> /etc/apt/sources.list"
 
 ### Install emoncms
 
