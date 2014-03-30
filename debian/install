@@ -7,3 +7,4 @@ Modules /usr/share/emoncms/www/
 Theme /usr/share/emoncms/www/
 scripts /usr/share/emoncms/www/
 conf/apache2/emoncms /etc/apache2/sites-available/
+conf/log4php/emoncms_log4j.xml /etc/emoncms/

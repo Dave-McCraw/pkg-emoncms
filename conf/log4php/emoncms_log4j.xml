@@ -1,0 +1,15 @@
+<configuration xmlns="http://logging.apache.org/log4php/">
+ 
+    <appender name="fileAppender" class="LoggerAppenderDailyFile">
+        <layout class="LoggerLayoutPattern">
+            <param name="conversionPattern" value="%date{Y-m-d H:i:s} [%logger : %line] %message%newline" />
+        </layout>
+        <param name="file" value="/var/log/emoncms/emoncms-%s.log" />
+        <param name="datePattern" value="Y-m-d" />
+    </appender>
+ 
+    <root>
+        <level value="FATAL" />
+        <appender_ref ref="fileAppender" />
+    </root>
+</configuration>

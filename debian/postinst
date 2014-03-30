@@ -91,6 +91,11 @@ echo " - /var/lib/timestore"
 mkdir -p /var/lib/timestore
 chown www-data:root /var/lib/timestore/
 
+echo "Verifying log directory exists and has the correct ownership..."
+echo " - /var/log/emoncms"
+mkdir -p /var/log/emoncms
+chown www-data:root /var/log/emoncms/
+
 # Create the MySQL db (if it doesn't already exist).
 echo "Attempting to create '$DATABASE' mysql database (with the '$DB_USER' user)..."
 mysql -u$DB_USER -p$DB_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $DATABASE;" || { echo ' - Failed (check username and password are correct, using dpkg-reconfigure. Check grants allow table creation, etc...)' ; exit 1; }
