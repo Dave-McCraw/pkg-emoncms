@@ -9,7 +9,7 @@ Package: emoncms
 Architecture: any
 Depends: debconf | debconf-2.0, 
   apache2, libapache2-mod-php5, 
-  php5, php5-mysql, php5-curl, php5-dev, php5-mcrypt, libphp-swiftmailer
+  php5, php5-mysql, php5-curl, php5-dev, php5-mcrypt, libphp-swiftmailer,
   mysql-server, mysql-client,  
   ufw, ntp,
   ${misc:Depends}
