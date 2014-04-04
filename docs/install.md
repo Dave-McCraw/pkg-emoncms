@@ -132,3 +132,5 @@ If this works, providing the same credentials to emoncms during installation sho
 Your `/etc/inittab` also needs to support access to the rfm12pi via serial by removing (or commenting out) the `ttyAMA0` line:
 
     # T0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100
+
+You'll need to `sudo reboot` your Pi after editing these files.
