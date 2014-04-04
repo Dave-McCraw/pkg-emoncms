@@ -122,3 +122,13 @@ The `emoncms` debian package has a declared dependency on the `mysql-server` and
     mysql -u <USERNAME> -p <PASSWORD>
     
 If this works, providing the same credentials to emoncms during installation should result in a successful database initialisation.
+
+### RFM12Pi system configuration
+
+**Important** - to interface with the rfm12pi board (with anything) you need to make sure you have edited your `/boot/cmdline.txt` to remove references to the Pi’s UART (`ttyAMA0`). There are probably two keys you need to remove, `console=ttyAMA0,115200` and `kgdboc=ttyAMA0,115200` so that you end up with something like:
+
+    dwc_otg.lpm_enable=0 console=tty1 root=/dev/sda2 rootfstype=ext4 elevator=deadline rootwait
+
+Your `/etc/inittab` also needs to support access to the rfm12pi via serial by removing (or commenting out) the `ttyAMA0` line:
+
+    # T0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100
