@@ -1,6 +1,12 @@
-emoncms (8.0.8) UNRELEASED; urgency=low
+emoncms (8.1.1) unstable; urgency=low
 
- Packages 8.0.8 
+  Packages 8.0.9 through 8.1.1
+
+ -- Dave McCraw <dave@mccraw.co.uk>  Wed, 09 Apr 2014 05:43:07 +0000
+
+emoncms (8.0.8) unstable; urgency=low
+
+  Packages 8.0.8 
 
  -- Dave McCraw <dave@mccraw.co.uk>  Sun, 30 Mar 2014 09:56:22 +0000
 
