@@ -9,7 +9,7 @@ You need to clone both Dave-McCraw/pkg-emoncms and emoncms/emoncms repositories 
 
 Export the source you want to package from the emoncms repository with the following command:
 
-    git archive export | gzip > ../emoncms.tar.gz
+    git archive 8.0.8 | gzip > ../emoncms.tar.gz
 
 Do some prep work for the import inside the pkg-emoncms repository:
 
