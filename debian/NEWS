@@ -1,3 +1,10 @@
+emoncms (8.1.2) unstable; urgency=low
+
+  Presentation / HTML / CSS changes
+  Improvements to logger initialisation
+
+ -- Dave McCraw <dave@mccraw.co.uk>  Mon, 21 Apr 2014 05:57:20 +0000
+
 emoncms (8.1.1) unstable; urgency=low
 
   Packages 8.0.9 through 8.1.1

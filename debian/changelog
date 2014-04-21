@@ -1,3 +1,16 @@
+emoncms (8.1.2) unstable; urgency=low
+
+  * 4ac0028 (Trystan Lea): Update index.php
+  * c0efcc8 (TrystanLea): Increased spacing between items in profile
+  * 4868b1f (Trystan Lea): Merge pull request #195 from Dave-McCraw/minorLoggingFix
+  * b7cae5c (Trystan Lea): Merge pull request #191 from inverse/ui-mod
+  * f6eff4e (Trystan Lea): Merge pull request #190 from inverse/readme-update
+  * 552a5ee (Dave McCraw): Tighten up logging initialisation
+  * d823cc0 (Malachi Soord): Moved CSS into separate file, Tidied up some HTML errors, removed some inline CSS
+  * a79bcf5 (Malachi Soord): Included brief description and links to site, forum and IRC channel
+
+ -- Dave McCraw <dave@mccraw.co.uk>  Mon, 21 Apr 2014 05:55:38 +0000
+
 emoncms (8.1.1) unstable; urgency=low
 
   * Packages 8.0.9 through 8.1.1 
