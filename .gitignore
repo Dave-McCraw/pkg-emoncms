@@ -24,3 +24,4 @@ Modules/mqtt
 Modules/packetgen
 Modules/openbem
 Modules/scheduler
+emoncms.log

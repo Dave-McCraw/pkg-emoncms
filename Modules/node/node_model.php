@@ -19,23 +19,24 @@ class Node
     private $mysqli;
     private $redis;
     private $process;
+    private $log;
 
     public function __construct($mysqli,$redis,$process)
     {
         $this->mysqli = $mysqli;
         $this->redis = $redis;
         $this->process = $process;
+        $this->log = new EmonLogger(__FILE__);
     }
 
     public function set($userid,$nodeid,$time,$data)
     {
+        $this->log->info("Node:set userid=$userid nodeid=$nodeid time=$time data=".implode(",",$data));
         // Input sanitisation
         $userid = (int) $userid;
         $nodeid = (int) $nodeid;
         $time = (int) $time;
         
-        $data = explode(",",$data);
-        for ($i=0; $i<count($data); $i++) $data[$i] = (int) $data[$i];
         $data = implode(",",$data);
 
         // Load the user's nodes object
@@ -62,7 +63,7 @@ class Node
             $this->set_mysql($userid,$nodes);
         }
 
-        $this->process($userid,$nodes,$nodeid,$data);
+        $this->process($userid,$nodes,$nodeid,$time,$data);
 
         return true;
     }
@@ -116,7 +117,15 @@ class Node
     {
         $userid = (int) $userid;
         if ($this->redis) {
-            return json_decode($this->redis->get("nodes:$userid"));
+            $nodes = $this->redis->get("nodes:$userid");
+            if ($nodes) {
+                return json_decode($nodes);
+            } else {
+                $nodes = $this->get_mysql($userid);
+                $this->redis->set("nodes:$userid",json_encode($nodes));
+                return $nodes;
+            }
+            
         } else {
             return $this->get_mysql($userid);
         }
@@ -124,11 +133,11 @@ class Node
 
     //----------------------------------------------------------------------------------------------
 
-    public function process($userid,$nodes,$nodeid,$data)
+    public function process($userid,$nodes,$nodeid,$time,$data)
     {    
         $bytes = explode(',',$data);
         $pos = 0;
-
+        
         if (isset($nodes->$nodeid->decoder) && sizeof($nodes->$nodeid->decoder->variables)>0)
         {
             foreach($nodes->$nodeid->decoder->variables as $variable)
@@ -138,6 +147,7 @@ class Node
                 // Byte value
                 if ($variable->type==0)
                 {
+                    if (!isset($bytes[$pos])) break;
                     $value = (int) $bytes[$pos];
                     $pos += 1;
                 }
@@ -145,6 +155,7 @@ class Node
                 // signed integer
                 if ($variable->type==1)
                 {
+                    if (!isset($bytes[$pos+1])) break;
                     $value = (int) $bytes[$pos] + (int) $bytes[$pos+1]*256;
                     if ($value>32768) $value += -65536;  
                     $pos += 2;
@@ -153,15 +164,13 @@ class Node
                 // unsigned long
                 if ($variable->type==2)
                 {
-                 
+                    if (!isset($bytes[$pos+3])) break;
                     $value = (int) $bytes[$pos] + (int) $bytes[$pos+1]*256 + (int) $bytes[$pos+2]*65536 + (int) $bytes[$pos+3]*16777216;
                     //if ($value>32768) $value += -65536;  
                     $pos += 4;
                 }
 
                 if (isset($variable->scale)) $value *= $variable->scale;
-
-                $time = time();
 
                 if (isset($variable->processlist) && $variable->processlist!='') $this->process->input($time,$value,$variable->processlist);
             }
