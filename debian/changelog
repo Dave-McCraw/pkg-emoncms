@@ -1,3 +1,9 @@
+emoncms (8.3.2) unstable; urgency=low
+
+  * Packages 8.1.2 through 8.3.2 
+
+ -- Dave McCraw <dave@mccraw.co.uk>  Wed, 23 Jul 2014 06:15:38 +0000
+
 emoncms (8.1.1) unstable; urgency=low
 
   * Packages 8.0.9 through 8.1.1 
