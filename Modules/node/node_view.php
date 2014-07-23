@@ -1,32 +1,15 @@
 <?php 
-  global $path; 
+  global $path, $feed_settings; 
+  
+  $enable_mysql_all = 0;
+  if (isset($feed_settings['enable_mysql_all']) && $feed_settings['enable_mysql_all']==true) $enable_mysql_all = 1;
+
 ?>
 <script type="text/javascript" src="<?php echo $path; ?>Modules/node/node.js"></script>
 <script type="text/javascript" src="<?php echo $path; ?>Modules/node/processlist.js"></script>
 <script type="text/javascript" src="<?php echo $path; ?>Modules/input/Views/input.js"></script>
 <script type="text/javascript" src="<?php echo $path; ?>Modules/input/Views/process_info.js"></script>
 <script type="text/javascript" src="<?php echo $path; ?>Modules/feed/feed.js"></script>
-
-<style>
-
-input[type=text][class=variable-name-edit] {
-  margin-bottom:0px;
-}
-
-body .modal {
-    /* new custom width */
-    width: 1080px;
-    /* must be half of the width, minus scrollbar on the left (30px) */
-    margin-left: -540px;
-    
-
-}
-
-.modal-body {
-    max-height: 800px;
-}
-
-</style>
 
 <br>
 <div id="apihelphead"><div style="float:right;"><a href="api"><?php echo _('Node API Help'); ?></a></div></div>
@@ -88,18 +71,20 @@ body .modal {
                         <span class="add-on feed-engine-label">Feed engine: </span>
                         <select id="feed-engine">
 
-                        <!--<optgroup label="Recommended">-->
-                        <option value=6 selected>Fixed Interval With Averaging</option>
+                        <optgroup label="Recommended">
+                        <option value=7 selected>Redis Time Series</option>
+                        <option value=8 >Redis FINA</option>
+                        <option value=6 >Fixed Interval With Averaging</option>
                         <option value=5 >Fixed Interval No Averaging</option>
                         <option value=2 >Variable Interval No Averaging</option>
-                        <!--</optgroup>-->
+                        </optgroup>
 
-                        <!--<optgroup label="Other">
+                        <optgroup label="Other">
                         <option value=4 >PHPTIMESTORE (Port of timestore to PHP)</option>  
                         <option value=1 >TIMESTORE (Requires installation of timestore)</option>
                         <option value=3 >GRAPHITE (Requires installation of graphite)</option>
                         <option value=0 >MYSQL (Slow when there is a lot of data)</option>
-                        </optgroup>-->
+                        </optgroup>
 
                         </select>
 
@@ -121,7 +106,7 @@ body .modal {
                         </select>
                         
                     </span>
-                    <button id="process-add" class="btn btn-info"/><?php echo _('Add'); ?></button>
+                    <button id="process-add" class="btn btn-info"><?php echo _('Add'); ?></button>
                 </div>
             </td>
         </tr>
@@ -143,6 +128,8 @@ body .modal {
 
   var path = "<?php echo $path; ?>";
   
+  processlist_ui.enable_mysql_all = <?php echo $enable_mysql_all; ?>;
+  
   var nodes = node.getall();
   
   var decoders = {
@@ -157,7 +144,8 @@ body .modal {
       updateinterval: 60,
       variables: [
         {name: 'Temperature', type: 1, scale: 0.01, units: '°C' },
-        {name: 'Battery Voltage', type: 1, scale:0.001, units: 'V'}
+        {name: 'Battery Voltage', type: 1, scale:0.001, units: 'V'},
+        {name: 'RSSI', type: 0 }
       ]
     },
     
@@ -170,7 +158,8 @@ body .modal {
         {name: 'Power 3', type: 1, units: 'W'}, 
         {name: 'Power 4', type: 1, units: 'W'},
         {name: 'Vrms', type: 1, scale: 0.01, units: 'V'}, 
-        {name: 'temp', type: 1, scale: 0.1, units: '°C'}
+        {name: 'temp', type: 1, scale: 0.1, units: '°C'},
+        {name: 'RSSI', type: 0 }
       ]
     },
 
@@ -186,7 +175,8 @@ body .modal {
         {name: 'Wh CT1', type: 2, units: 'Wh'}, 
         {name: 'Wh CT2', type: 2, units: 'Wh'}, 
         {name: 'Wh CT3', type: 2, units: 'Wh'}, 
-        {name: 'Wh CT4', type: 2, units: 'Wh'}
+        {name: 'Wh CT4', type: 2, units: 'Wh'},
+        {name: 'RSSI', type: 0 }
       ]
     },
     
@@ -198,6 +188,7 @@ body .modal {
         {name: 'External temperature', type: 1, scale: 0.1, units: '°C'}, 
         {name: 'Humidity', type: 1, scale: 0.1, units: '%'}, 
         {name: 'Battery Voltage', type: 1, scale: 0.1, units: 'V'},
+        {name: 'RSSI', type: 0 }
       ]
     },
     

@@ -20,16 +20,32 @@ if (LOG4PHP_INSTALLED)
 class EmonLogger
 {
     private $concreteLogger;
-
+    private $loggerConfigured = false;
+    
     public function __construct($clientFileName)
     {
-        $clientFileNameWithoutPath = basename($clientFileName);
-        if (LOG4PHP_INSTALLED)
+        global $log4php_configPath;
+        if (!$log4php_configPath || !file_exists($log4php_configPath)){
+            $this->loggerConfigured = false;
+            return;
+        }
+        
+        
+        if (LOG4PHP_INSTALLED){
+            Logger::configure( $log4php_configPath );
+            $clientFileNameWithoutPath = basename($clientFileName);
             $this->concreteLogger = Logger::getLogger($clientFileNameWithoutPath);
+            $this->loggerConfigured = true;
+        }
     }
 
     public function info ($message){
-        if (LOG4PHP_INSTALLED)
+        if ($this->loggerConfigured)
             $this->concreteLogger->info($message);
+    }
+    
+    public function warn ($message){
+        if ($this->loggerConfigured)
+            $this->concreteLogger->warn(date("Y-n-j H:i:s", time()).", ".$message);
     }
 }

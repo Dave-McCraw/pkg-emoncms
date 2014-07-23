@@ -32,14 +32,13 @@ function input_controller()
 
     require "Modules/input/process_model.php"; // 886
     $process = new Process($mysqli,$input,$feed);
-
-
+    
+    $process->set_timezone_offset($user->get_timezone($session['userid']));
 
     if ($route->format == 'html')
     {
         if ($route->action == 'api') $result = view("Modules/input/Views/input_api.php", array());
-        if ($route->action == 'node') $result =  view("Modules/input/Views/input_node.php", array());
-        if ($route->action == 'process') $result = view("Modules/input/Views/process_list.php",array('inputid'=> intval(get('inputid'))));
+        if ($route->action == 'view') $result =  view("Modules/input/Views/input_view.php", array());
     }
 
     if ($route->format == 'json')

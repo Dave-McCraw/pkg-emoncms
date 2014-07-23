@@ -6,7 +6,7 @@
 class PHPFiwa
 {
     private $dir = "/var/lib/phpfiwa/";
-
+    private $log;
     /**
      * Constructor.
      *
@@ -15,6 +15,7 @@ class PHPFiwa
     public function __construct($settings)
     {
         if (isset($settings['datadir'])) $this->dir = $settings['datadir'];
+        $this->log = new EmonLogger(__FILE__);
     }
 
     /**
@@ -30,6 +31,7 @@ class PHPFiwa
         // Check to ensure we dont overwrite an existing feed
         if (!$meta = $this->get_meta($id))
         {
+            $this->log->info("PHPFIWA:create creating feed id=$id");
             // Set initial feed meta data
             $meta = new stdClass();
             $meta->id = $id;
@@ -70,7 +72,7 @@ class PHPFiwa
             if ($meta->nlayers==0) return false;
 
             // Save meta data
-            $this->set_meta($id,$meta);
+            $this->create_meta($id,$meta);
             
             $fh = fopen($this->dir.$meta->id."_0.dat", 'c+');
             fclose($fh);
@@ -96,25 +98,41 @@ class PHPFiwa
      * @param float $value The value of the data point
     */
     public function post($id,$timestamp,$value)
-    {
+    {   
+        $this->log->info("PHPFiwa:post id=$id timestamp=$timestamp value=$value");
+
         $id = (int) $id;
         $timestamp = (int) $timestamp;
         $value = (float) $value;
+
+        $now = time();
+        $start = $now-(3600*24*365*5); // 5 years in past
+        $end = $now+(3600*48);         // 48 hours in future
+        
+        if ($timestamp<$start || $timestamp>$end) {
+            $this->log->warn("PHPFiwa:post timestamp out of range");
+            return false;
+        }
         
         $layer = 0;
 
         // If meta data file does not exist then exit
-        if (!$meta = $this->get_meta($id)) return false;
+        if (!$meta = $this->get_meta($id)) {
+            $this->log->warn("PHPFiwa:post failed to fetch meta id=$id");
+            return false;
+        }
 
         // Calculate interval that this datapoint belongs too
         $timestamp = floor($timestamp / $meta->interval[$layer]) * $meta->interval[$layer];
 
         // If this is a new feed (npoints == 0) then set the start time to the current datapoint
-        if ($meta->npoints[0] == 0) {
+        if ($meta->npoints[0] == 0 && $meta->start_time==0) {
             $meta->start_time = $timestamp;
+            $this->create_meta($id,$meta);
         }
 
         if ($timestamp < $meta->start_time) {
+            $this->log->warn("PHPFiwa:post timestamp older than feed start time id=$id");
             return false; // in the past
         }	
 
@@ -124,25 +142,39 @@ class PHPFiwa
         $last_point = $meta->npoints[0] - 1;
 
         if ($point<=$last_point) {
+             // $this->log->warn("PHPFiwa:post updating of datapoints to be made via update function id=$id");
              return false; // updating of datapoints to be made available via update function
         }
         
         $result = $this->update_layer($meta,$layer,$point,$timestamp,$value);
-        
-        if ($result!=false)
-        {
-            $this->set_meta($id,$result);
-        }
     }
     
     private function update_layer($meta,$layer,$point,$timestamp,$value)
     {
         $fh = fopen($this->dir.$meta->id."_$layer.dat", 'c+');
+        if (!$fh) {
+            $this->log->warn("PHPFiwa:update_layer could not open data file layer $layer id=".$meta->id);
+            return false;
+        }
+        
+        if (!flock($fh, LOCK_EX)) {
+            $this->log->warn("PHPFiwa:update_layer data file for layer=$layer feedid=".$meta->id." is locked by another process");
+            fclose($fh);
+            return false;
+        }
         
         // 1) Write padding
         $last_point = $meta->npoints[$layer] - 1;
         $padding = ($point - $last_point)-1;
-        if ($padding>0) $this->write_padding($fh,$meta->npoints[$layer],$padding);
+        
+        if ($padding>0) {
+            if ($this->write_padding($fh,$meta->npoints[$layer],$padding)===false)
+            {
+                // Npadding returned false = max block size was exeeded
+                $this->log->warn("PHPFiwa:update_layer padding max block size exeeded $padding id=".$meta->id);
+                return false;
+            }
+        }
         
         // 2) Write new datapoint
 	    fseek($fh,4*$point);
@@ -301,6 +333,8 @@ class PHPFiwa
         // If meta data file does not exist then exit
         if (!$meta = $this->get_meta($feedid)) return false;
 
+
+
         if ($outinterval<$meta->interval[0]) $outinterval = $meta->interval[0];
         $dp = floor(($end - $start) / $outinterval);
         if ($dp<1) return false;
@@ -420,16 +454,66 @@ class PHPFiwa
         }
     }
     
-    public function export($feedid,$start)
+    public function export($id,$start,$layer)
     {
-    
+        $id = (int) $id;
+        $start = (int) $start;
+        $layer = (int) $layer;
+        
+        $feedname = $id."_$layer.dat";
+                
+        // If meta data file does not exist then exit
+        if (!$meta = $this->get_meta($id)) {
+            $this->log->warn("PHPFiwa:post failed to fetch meta id=$id");
+            return false;
+        }
+        
+        // There is no need for the browser to cache the output
+        header("Cache-Control: no-cache, no-store, must-revalidate");
+
+        // Tell the browser to handle output as a csv file to be downloaded
+        header('Content-Description: File Transfer');
+        header("Content-type: application/octet-stream");
+        header("Content-Disposition: attachment; filename={$feedname}");
+
+        header("Expires: 0");
+        header("Pragma: no-cache");
+
+        // Write to output stream
+        $fh = @fopen( 'php://output', 'w' );
+        
+        $primary = fopen($this->dir.$feedname, 'rb');
+        $primarysize = filesize($this->dir.$feedname);
+        
+        $localsize = $start;
+        $localsize = intval($localsize / 4) * 4;
+        if ($localsize<0) $localsize = 0;
+
+        // Get the first point which will be updated rather than appended
+        if ($localsize>=4) $localsize = $localsize - 4;
+        
+        fseek($primary,$localsize);
+        $left_to_read = $primarysize - $localsize;
+        if ($left_to_read>0){
+            do
+            {
+                if ($left_to_read>8192) $readsize = 8192; else $readsize = $left_to_read;
+                $left_to_read -= $readsize;
+
+                $data = fread($primary,$readsize);
+                fwrite($fh,$data);
+            }
+            while ($left_to_read>0);
+        }
+        fclose($primary);
+        fclose($fh);
+        exit;
     }
     
     public function delete($id)
     {
         if (!$meta = $this->get_meta($id)) return false;
         unlink($this->dir.$meta->id.".meta");
-        
         for ($i=0; $i<$meta->nlayers; $i++)
         {
           unlink($this->dir.$meta->id."_$i.dat");
@@ -457,7 +541,9 @@ class PHPFiwa
         
         // print $this->dir.$feedname;
         
-        if (!file_exists($this->dir.$feedname)) return false;
+        if (!file_exists($this->dir.$feedname)) {
+            return false;
+        }
         
         $meta = new stdClass();
         $metafile = fopen($this->dir.$feedname, 'rb');
@@ -465,11 +551,21 @@ class PHPFiwa
         $tmp = unpack("I",fread($metafile,4)); 
         $meta->id = $tmp[1];
         
+        if ($meta->id != $id) {
+            $this->log->warn("PHPFiwa:get_meta feed:$id meta data mismatch, meta id: ".$meta->id);
+            return false;
+        }
+        
         $tmp = unpack("I",fread($metafile,4)); 
         $meta->start_time = $tmp[1];
         
         $tmp = unpack("I",fread($metafile,4)); 
         $meta->nlayers = $tmp[1];
+        
+        if ($meta->nlayers<1 || $meta->nlayers>4) {
+            $this->log->warn("PHPFiwa:get_meta feed:$id nlayers out of range");
+            return false;
+        }
         
         $meta->npoints = array();
         for ($i=0; $i<$meta->nlayers; $i++)
@@ -486,20 +582,48 @@ class PHPFiwa
         }
         
         fclose($metafile);
+   
+        $meta->npoints = array();
+        for ($i=0; $i<$meta->nlayers; $i++)
+        {
+          clearstatcache($this->dir.$meta->id."_$i.dat");
+          $meta->npoints[$i] = floor(filesize($this->dir.$meta->id."_$i.dat") / 4.0);
+        }
+        
+        
+        if ($meta->start_time <= 0 && $meta->npoints[0]>1) {
+            $this->log->warn("PHPFiwa:get_meta feed:$id start time must be greater than zero");
+        }
+        
+        if ($meta->start_time>0 && $meta->npoints[0]==0) {
+            $this->log->warn("PHPFiwa:get_meta start_time already defined but npoints is 0");
+        }
         
         return $meta;
     }
-    
-    public function set_meta($id,$meta)
+
+    public function create_meta($id,$meta)
     {
         $id = (int) $id;
         $feedname = "$id.meta";
     
         $metafile = fopen($this->dir.$feedname, 'wb');
+        
+        if (!$metafile) {
+            $this->log->warn("PHPFIWA:create_meta could not open meta data file id=".$meta->id);
+            return false;
+        }
+        
+        if (!flock($metafile, LOCK_EX)) {
+            $this->log->warn("PHPFiwa:create_meta meta file id=".$meta->id." is locked by another process");
+            fclose($metafile);
+            return false;
+        }
+        
         fwrite($metafile,pack("I",$meta->id));
         fwrite($metafile,pack("I",$meta->start_time)); 
         fwrite($metafile,pack("I",$meta->nlayers));
-        foreach ($meta->npoints as $n) fwrite($metafile,pack("I",$n));
+        foreach ($meta->npoints as $n) fwrite($metafile,pack("I",0));       // Legacy
         foreach ($meta->interval as $d) fwrite($metafile,pack("I",$d));
         
         fclose($metafile);
@@ -510,7 +634,7 @@ class PHPFiwa
         $tsdb_max_padding_block = 1024 * 1024;
         
         // Padding amount too large
-        if ($npadding>$tsdb_max_padding_block*2) { 
+        if ($npadding>$tsdb_max_padding_block*2) {
             return false;
         }
 
